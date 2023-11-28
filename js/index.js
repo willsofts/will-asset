@@ -15,11 +15,17 @@
 		}
 		function logIn(){
 			startWaiting();
+			let params = {};
+			let main_fields = {"main_username":"username", "main_pass":"password", "main_state":"state", "main_nonce":"nonce"};
+			for(let field in main_fields) {				
+				params[main_fields[field]] = $("#"+field).val();
+			}
+			console.log("params",params);
 			jQuery.ajax({
 				url: API_URL+"/api/sign/signin",
 				type: "POST",
 				contentType: defaultContentType,
-				data: $("#main_form").serialize(), 
+				data: params, 
 				dataType: "html",
 				error : function(transport,status,errorThrown) { 
 					stopWaiting();
