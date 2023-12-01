@@ -50,12 +50,12 @@
 					addBlankMenuItem(alink);
 					alink.remove(); 
 				});
-				let $todo = $("<ul class=\"todo\" style=\"display:none;\"></ul>").append($del);
-				alink.append($todo);
+				let $item = $("<ul class=\"todo\" style=\"display:none;\"></ul>").append($del);
+				alink.append($item);
 				alink.hover(function() { 
-						$todo.show();
+						$item.show();
 					},function() { 
-						$todo.hide();
+						$item.hide();
 				});
 			}
 			function insertNewFavorMenuItem(alink,fs_prog,fs_title,fs_icon) {
