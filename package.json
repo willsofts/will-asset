@@ -1,0 +1,19 @@
+{
+  "name": "@willsofts/will-asset",
+  "version": "1.0.19",
+  "description": "Assets for template",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "tassan_oro@freewillsolutions.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/willsofts/will-asset/issues"
+  },
+  "homepage": "https://github.com/willsofts/will-asset#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/willsofts/will-asset.git"
+  }
+}
