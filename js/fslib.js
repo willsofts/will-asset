@@ -13,6 +13,7 @@ var BASE_URL = "";
 var CDN_URL = "";
 var API_TOKEN = null;
 var BASE_STORAGE = "";
+var SECURE_STORAGE = true;
 var META_INFO = {};
 function getWindowByName(winname) {
 	if(!winname) return null;
@@ -871,6 +872,7 @@ function submitWindow(settings) {
 }		 
 function openNewWindow(settings) {
 	let defaultSettings = {
+		newTab: true,
 		method: "POST",
 		url : "",
 		windowName : "_blank",
@@ -896,8 +898,13 @@ function openNewWindow(settings) {
 	let wy = (sh - p.windowHeight) / 2; 
 	let fs_features = "top="+wy+",left="+wx+",width="+p.windowWidth+",height="+p.windowHeight+","+p.windowFeatures;
 	let fs_window = null;
-	if(p.params) fs_window = window.open("",p.windowName,fs_features); 
-	else fs_window = window.open(p.url,p.windowName,fs_features); 
+	if(p.newTab) {
+		if(p.params) fs_window = window.open("",p.windowName); 
+		else fs_window = window.open(p.url,p.windowName); 
+	} else {
+		if(p.params) fs_window = window.open("",p.windowName,fs_features); 
+		else fs_window = window.open(p.url,p.windowName,fs_features); 
+	}
 	fs_window.opener = self; 
 	try {	 
 		window.parent.addWindow(fs_window); 
@@ -1123,13 +1130,13 @@ function confirmDialog(msg, okCallback, cancelCallback, width, height) {
 		return;
     } catch (ex) { console.log(ex.description); }
 }
-function submitFailure(xhr, status, errorThrown) {
+function submitFailure(xhr, status, errorThrown, checking=true) {
 	stopWaiting();
 	console.log(xhr.responseText);
 	console.log("status = "+status+" : xhr = "+xhr.status);
 	errorThrown = parseErrorThrown(xhr, status, errorThrown);
 	alertbox(errorThrown, function() { 
-		if(xhr.status==401) { 
+		if(checking && xhr.status==401) { 
 			//window.open("index.jsp","_self"); 
 			try {
 				window.parent.reLogin();
@@ -1611,13 +1618,28 @@ function createMandatoryParameters(aform) {
 	});
 	return result;
 }
+var secureEngine;
+function getSecureEngine() {
+    if(!secureEngine) {
+        secureEngine = SECURE_STORAGE ? new SecureLS.default({storage: "local"==BASE_STORAGE ? localStorage : sessionStorage}) : null;
+		console.info("secure engine:",secureEngine);
+    }
+    return secureEngine;
+}
 function getStorage(key) {
+    let secureLs = getSecureEngine();
+    if(secureLs) return secureLs.get(key);    
 	if("local"==BASE_STORAGE) {
 		return localStorage.getItem(key);
 	}
     return sessionStorage.getItem(key);
 }
 function setStorage(key,value) {
+    let secureLs = getSecureEngine();
+    if(secureLs) {
+        secureLs.set(key,value);
+        return;
+    }
 	if("local"==BASE_STORAGE) {
 		localStorage.setItem(key,value);
 		return;
@@ -1625,6 +1647,11 @@ function setStorage(key,value) {
 	sessionStorage.setItem(key,value);
 }
 function removeStorage(key) {
+    let secureLs = getSecureEngine();
+    if(secureLs) {
+        secureLs.remove(key);
+        return;
+    }
 	if("local"==BASE_STORAGE) {
 		localStorage.removeItem(key);
 		return;
@@ -1689,7 +1716,7 @@ function getDH() {
 }
 function sendMessageInterface() {
 	let info = getAccessorInfo();
-	let msg = {type: "storage", API_URL: API_URL, BASE_URL: BASE_URL, API_TOKEN: API_TOKEN, accessorinfo: info};
+	let msg = {type: "storage", API_URL: API_URL, BASE_URL: BASE_URL, API_TOKEN: API_TOKEN, BASE_STORAGE: BASE_STORAGE, SECURE_STORAGE: SECURE_STORAGE, accessorinfo: info};
 	sendMessageToFrame(msg);
 }
 function sendMessageToFrame(data) {
