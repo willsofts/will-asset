@@ -1,6 +1,6 @@
 {
   "name": "@willsofts/will-asset",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "description": "Assets for template",
   "main": "index.js",
   "scripts": {
